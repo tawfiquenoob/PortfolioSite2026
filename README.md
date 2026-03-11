@@ -1,5 +1,7 @@
 # Full-Stack Portfolio Platform
 
+[![CI](https://github.com/tawfiquenoob/PortfolioSite2026/actions/workflows/ci.yml/badge.svg)](https://github.com/tawfiquenoob/PortfolioSite2026/actions/workflows/ci.yml)
+
 Production-grade full-stack portfolio built as a professional monorepo using:
 
 - Next.js (App Router) + TypeScript
