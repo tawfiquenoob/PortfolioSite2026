@@ -1,0 +1,65 @@
+services:
+  db:
+    build:
+      context: .
+      dockerfile: infra/postgres/Dockerfile
+    container_name: portfolio_db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-portfolio_db}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./apps/api
+    container_name: portfolio_api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      API_PORT: 4000
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio_db?schema=public
+      CORS_ORIGIN: http://localhost:3000
+      JWT_SECRET: ${JWT_SECRET:-change-me}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@portfolio.dev}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-supersecurepassword}
+    ports:
+      - "4000:4000"
+    command: sh -c "npx prisma migrate deploy && node dist/index.js"
+
+  seed:
+    build:
+      context: ./apps/api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/portfolio_db?schema=public
+    command: sh -c "npx prisma migrate deploy && npm run seed"
+    restart: "no"
+
+  web:
+    build:
+      context: ./apps/web
+    container_name: portfolio_web
+    depends_on:
+      - api
+    environment:
+      NODE_ENV: production
+      NEXT_PUBLIC_API_BASE_URL: http://api:4000
+      NEXT_PUBLIC_SITE_URL: http://localhost:3000
+    ports:
+      - "3000:3000"
+
+volumes:
+  postgres_data:
