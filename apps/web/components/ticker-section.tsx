@@ -28,7 +28,9 @@ export function TickerSection() {
       ease: "none"
     });
 
-    return () => tween.kill();
+    return () => {
+      tween.kill();
+    };
   }, []);
 
   return (
