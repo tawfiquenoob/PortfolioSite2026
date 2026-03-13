@@ -16,5 +16,10 @@ export const config = {
   databaseUrl: requireEnv("DATABASE_URL"),
   jwtSecret: requireEnv("JWT_SECRET", "change-me"),
   adminEmail: requireEnv("ADMIN_EMAIL", "admin@portfolio.dev"),
-  adminPassword: requireEnv("ADMIN_PASSWORD", "supersecurepassword")
+  adminPassword: requireEnv("ADMIN_PASSWORD", "supersecurepassword"),
+  resendApiKey: process.env.RESEND_API_KEY ?? "",
+  contactNotificationEmail:
+    process.env.CONTACT_NOTIFICATION_EMAIL ?? "admin@portfolio.dev",
+  contactFromEmail:
+    process.env.CONTACT_FROM_EMAIL ?? "Portfolio Contact <onboarding@resend.dev>"
 };

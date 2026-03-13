@@ -9,3 +9,24 @@ export type Project = {
   featured: boolean;
   createdAt: string;
 };
+
+export type ContactMessage = {
+  id: number;
+  name: string;
+  email: string;
+  projectType: string;
+  message: string;
+  createdAt: string;
+};
+
+export type AnalyticsSummary = {
+  totalPageViews: number;
+  viewsByPath: Array<{
+    path: string;
+    count: number;
+  }>;
+  last30Days: Array<{
+    day: string;
+    count: number;
+  }>;
+};

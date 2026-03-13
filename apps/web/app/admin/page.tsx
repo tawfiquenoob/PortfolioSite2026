@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getApiBaseUrl } from "@/lib/api";
-import { Project } from "@/lib/types";
+import { AnalyticsSummary, ContactMessage, Project } from "@/lib/types";
 
 const apiBase = getApiBaseUrl();
 
@@ -23,6 +23,8 @@ export default function AdminPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [projects, setProjects] = useState<Project[]>([]);
+  const [contacts, setContacts] = useState<ContactMessage[]>([]);
+  const [analytics, setAnalytics] = useState<AnalyticsSummary | null>(null);
   const [form, setForm] = useState<ProjectForm>(emptyForm);
   const [editId, setEditId] = useState<number | null>(null);
   const isAuthed = useMemo(() => Boolean(token), [token]);
@@ -35,14 +37,42 @@ export default function AdminPage() {
   }, []);
 
   useEffect(() => {
-    fetchProjects();
+    void fetchProjects();
   }, []);
+
+  useEffect(() => {
+    if (!token) return;
+    void fetchContacts(token);
+    void fetchAnalytics(token);
+  }, [token]);
 
   async function fetchProjects() {
     const response = await fetch(`${apiBase}/api/projects`);
     if (!response.ok) return;
     const data = (await response.json()) as Project[];
     setProjects(data);
+  }
+
+  async function fetchContacts(authToken: string) {
+    const response = await fetch(`${apiBase}/api/contact`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    });
+    if (!response.ok) return;
+    const data = (await response.json()) as ContactMessage[];
+    setContacts(data);
+  }
+
+  async function fetchAnalytics(authToken: string) {
+    const response = await fetch(`${apiBase}/api/analytics/summary`, {
+      headers: {
+        Authorization: `Bearer ${authToken}`
+      }
+    });
+    if (!response.ok) return;
+    const data = (await response.json()) as AnalyticsSummary;
+    setAnalytics(data);
   }
 
   async function handleLogin() {
@@ -60,6 +90,8 @@ export default function AdminPage() {
     const data = (await response.json()) as { token: string };
     setToken(data.token);
     localStorage.setItem("portfolio_admin_token", data.token);
+    await fetchContacts(data.token);
+    await fetchAnalytics(data.token);
   }
 
   async function handleSave() {
@@ -105,6 +137,20 @@ export default function AdminPage() {
     }
 
     await fetchProjects();
+  }
+
+  async function handleDeleteContact(id: number) {
+    const response = await fetch(`${apiBase}/api/contact/${id}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      alert("Delete contact failed");
+      return;
+    }
+    await fetchContacts(token);
   }
 
   function startEdit(project: Project) {
@@ -275,6 +321,73 @@ export default function AdminPage() {
               </article>
             ))}
           </div>
+        </section>
+      </div>
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        <section className="glass-card p-6">
+          <h2 className="text-xl font-semibold">Contact Inbox</h2>
+          <p className="mt-2 text-sm text-muted">
+            Messages are stored in PostgreSQL. Email notifications are sent when
+            Resend API is configured.
+          </p>
+          <div className="mt-4 space-y-4">
+            {contacts.length === 0 ? (
+              <p className="text-sm text-muted">No contact messages yet.</p>
+            ) : (
+              contacts.map((contact) => (
+                <article
+                  key={contact.id}
+                  className="rounded-xl border border-slate-700 p-4"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="font-semibold">{contact.name}</h3>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteContact(contact.id)}
+                      className="text-sm text-rose-300"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <p className="mt-1 text-sm text-slate-300">{contact.email}</p>
+                  <p className="mt-1 text-xs uppercase text-accent">
+                    {contact.projectType}
+                  </p>
+                  <p className="mt-2 text-sm text-muted">{contact.message}</p>
+                </article>
+              ))
+            )}
+          </div>
+        </section>
+        <section className="glass-card p-6">
+          <h2 className="text-xl font-semibold">Analytics</h2>
+          {!analytics ? (
+            <p className="mt-4 text-sm text-muted">No analytics data yet.</p>
+          ) : (
+            <>
+              <div className="mt-4 rounded-xl border border-slate-700 p-4">
+                <p className="text-sm text-muted">Total page views</p>
+                <p className="mt-1 text-3xl font-bold text-accent">
+                  {analytics.totalPageViews}
+                </p>
+              </div>
+              <div className="mt-4 rounded-xl border border-slate-700 p-4">
+                <h3 className="font-semibold">Top paths</h3>
+                <div className="mt-3 space-y-2 text-sm">
+                  {analytics.viewsByPath.length === 0 ? (
+                    <p className="text-muted">No path events yet.</p>
+                  ) : (
+                    analytics.viewsByPath.map((entry) => (
+                      <div key={entry.path} className="flex justify-between">
+                        <span>{entry.path}</span>
+                        <span className="text-accent">{entry.count}</span>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </>
+          )}
         </section>
       </div>
     </main>

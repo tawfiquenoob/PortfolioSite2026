@@ -6,17 +6,14 @@ export function Navbar() {
           Portfolio<span className="text-accent">.</span>
         </a>
         <div className="flex gap-6 text-sm text-muted">
-          <a href="#about" className="hover:text-white">
-            About
-          </a>
           <a href="#projects" className="hover:text-white">
             Projects
           </a>
-          <a href="#skills" className="hover:text-white">
-            Skills
-          </a>
-          <a href="#contact" className="hover:text-white">
+          <a href="/contact" className="hover:text-white">
             Contact
+          </a>
+          <a href="/admin" className="hover:text-white">
+            Admin
           </a>
         </div>
       </nav>

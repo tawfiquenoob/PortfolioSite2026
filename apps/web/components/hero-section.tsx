@@ -38,9 +38,6 @@ export function HeroSection() {
         className="mt-10 flex gap-4"
       >
         <Button href="#projects">View Projects</Button>
-        <Button href="#contact" className="bg-slate-200 text-slate-900">
-          Contact Me
-        </Button>
       </motion.div>
     </section>
   );

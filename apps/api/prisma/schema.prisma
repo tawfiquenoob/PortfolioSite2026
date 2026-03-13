@@ -18,3 +18,19 @@ model Project {
   featured    Boolean  @default(false)
   createdAt   DateTime @default(now())
 }
+
+model ContactMessage {
+  id          Int      @id @default(autoincrement())
+  name        String
+  email       String
+  projectType String
+  message     String
+  createdAt   DateTime @default(now())
+}
+
+model EventLog {
+  id        Int      @id @default(autoincrement())
+  eventType String
+  path      String
+  createdAt DateTime @default(now())
+}

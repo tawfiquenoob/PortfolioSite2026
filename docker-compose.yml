@@ -33,6 +33,9 @@ services:
       JWT_SECRET: ${JWT_SECRET:-change-me}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@portfolio.dev}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-supersecurepassword}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      CONTACT_NOTIFICATION_EMAIL: ${CONTACT_NOTIFICATION_EMAIL:-admin@portfolio.dev}
+      CONTACT_FROM_EMAIL: "${CONTACT_FROM_EMAIL:-Portfolio Contact <onboarding@resend.dev>}"
     ports:
       - "4000:4000"
     command: sh -c "npx prisma migrate deploy && node dist/index.js"

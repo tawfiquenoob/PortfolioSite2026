@@ -72,6 +72,11 @@ From repository root:
 - `PUT /api/projects/:id` (JWT protected)
 - `DELETE /api/projects/:id` (JWT protected)
 - `POST /api/auth/login`
+- `POST /api/contact` (public, rate-limited, stores message + optional Resend email)
+- `GET /api/contact` (JWT protected)
+- `DELETE /api/contact/:id` (JWT protected)
+- `POST /api/analytics/page-view` (public, rate-limited)
+- `GET /api/analytics/summary` (JWT protected)
 
 ## Admin Credentials
 
@@ -81,6 +86,14 @@ Set via environment variables:
 - `ADMIN_PASSWORD`
 
 Use `/admin` route in the web app to manage projects.
+
+## Optional Email Notifications (Resend Free Tier)
+
+To send contact notifications, configure:
+
+- `RESEND_API_KEY`
+- `CONTACT_NOTIFICATION_EMAIL`
+- `CONTACT_FROM_EMAIL`
 
 ## CI/CD Workflow
 
